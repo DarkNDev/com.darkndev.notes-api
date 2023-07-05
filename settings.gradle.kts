@@ -1,0 +1,1 @@
+rootProject.name = "com.darkndev.notes-api-alt"
