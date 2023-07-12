@@ -1,12 +1,14 @@
 package com.darkndev.plugins
 
 import com.darkndev.data.NoteDao
+import com.darkndev.data.UserDao
 import com.darkndev.routes.noteResponse
 import com.darkndev.routes.signIn
 import com.darkndev.routes.signUp
 import com.darkndev.security.hashing.SHA256HashingService
 import com.darkndev.security.token.JwtTokenService
 import com.darkndev.security.token.TokenConfig
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -21,7 +23,8 @@ fun Application.configureRouting(
     hashingService: SHA256HashingService,
     tokenService: JwtTokenService,
     tokenConfig: TokenConfig,
-    noteDao: NoteDao
+    noteDao: NoteDao,
+    userDao: UserDao
 ) {
     install(ContentNegotiation) {
         json()
@@ -37,8 +40,12 @@ fun Application.configureRouting(
         get("/") {
             call.respond("Welcome to Notes Api!!")
         }
-        signIn(hashingService, tokenService, tokenConfig)
-        signUp(hashingService)
+        get("/users") {
+            val users = userDao.allUsers()
+            call.respond(HttpStatusCode.OK, users)
+        }
+        signIn(hashingService, tokenService, tokenConfig, userDao)
+        signUp(hashingService, userDao)
         noteResponse(noteDao)
     }
 }

@@ -14,8 +14,7 @@ class UserDao {
         id = row[Users.id],
         username = row[Users.username],
         password = row[Users.password],
-        salt = row[Users.salt],
-        updated = row[Users.updated]
+        salt = row[Users.salt]
     )
 
     suspend fun allUsers(): List<User> = userQuery {
@@ -33,7 +32,6 @@ class UserDao {
             it[Users.username] = username
             it[Users.password] = password
             it[Users.salt] = salt
-            it[Users.updated] = System.currentTimeMillis()
         }
         insertStatement.resultedValues?.singleOrNull()?.let(::resultRowToUser)
     }

@@ -2,6 +2,7 @@ package com.darkndev
 
 import com.darkndev.data.NoteDao
 import com.darkndev.data.NoteDatabaseFactory
+import com.darkndev.data.UserDao
 import com.darkndev.plugins.configureRouting
 import com.darkndev.plugins.configureSecurity
 import io.ktor.server.application.*
@@ -22,13 +23,14 @@ fun Application.module() {
     val tokenConfig = TokenConfig(
         issuer = environment.config.property("jwt.issuer").getString(),
         audience = environment.config.property("jwt.audience").getString(),
-        expiresIn = Duration.ofHours(1).toMillis(),
+        expiresIn = Duration.ofDays(365).toMillis(),
         secret = System.getenv("JWT_SECRET")
     )
 
     val hashingService = SHA256HashingService()
-    val noteDaoInstance = NoteDao()
+    val noteDao = NoteDao()
+    val userDao = UserDao()
 
     configureSecurity(tokenConfig)
-    configureRouting(hashingService, tokenService, tokenConfig,noteDaoInstance)
+    configureRouting(hashingService, tokenService, tokenConfig, noteDao, userDao)
 }

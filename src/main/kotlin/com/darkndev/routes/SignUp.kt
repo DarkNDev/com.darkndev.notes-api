@@ -10,9 +10,9 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun Route.signUp(
-    hashingService: SHA256HashingService
+    hashingService: SHA256HashingService,
+    userDao:UserDao
 ) {
-    val userDao = UserDao()
     post("/signup") {
         val request = call.receive<AuthRequest>()
 

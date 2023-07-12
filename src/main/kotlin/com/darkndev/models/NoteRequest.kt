@@ -7,4 +7,4 @@ data class NoteRequest(
     val id: Int,
     val title: String,
     val content: String
-) : java.io.Serializable
+)

@@ -17,9 +17,9 @@ import io.ktor.server.routing.*
 fun Route.signIn(
     hashingService: SHA256HashingService,
     tokenService: JwtTokenService,
-    tokenConfig: TokenConfig
+    tokenConfig: TokenConfig,
+    userDao:UserDao
 ) {
-    val userDao = UserDao()
     post("/signin") {
         val request = call.receive<AuthRequest>()
 
