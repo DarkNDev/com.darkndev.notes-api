@@ -43,6 +43,10 @@ dependencies {
     //implementation("org.ehcache:ehcache:$ehcache_version")
 
     implementation("io.ktor:ktor-server-websockets-jvm:$ktor_version")
+
+    implementation("io.ktor:ktor-server-auth-jvm:$ktor_version")
+    implementation("io.ktor:ktor-server-auth-jwt-jvm:$ktor_version")
+    implementation("commons-codec:commons-codec:1.16.0")
 }
 
 ktor {

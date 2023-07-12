@@ -1,17 +1,17 @@
 package com.darkndev.models
 
-import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.Table
 
-@Serializable
 data class Note(
     val id: Int,
+    val userId: Int,
     val title: String,
     val content: String
-) : java.io.Serializable
+)
 
 object Notes : Table() {
     val id = integer("id")
+    val userId = integer("userId")
     val title = varchar("title", 128)
     val content = varchar("content", 4096)
 

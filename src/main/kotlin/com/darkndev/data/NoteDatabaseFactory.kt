@@ -1,6 +1,7 @@
 package com.darkndev.data
 
 import com.darkndev.models.Notes
+import com.darkndev.models.Users
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.config.*
@@ -22,6 +23,7 @@ object NoteDatabaseFactory {
         val database = Database.connect(createHikariDataSource(url = jdbcURL, driver = driverClassName))
         transaction(database) {
             SchemaUtils.create(Notes)
+            SchemaUtils.create(Users)
         }
     }
 
@@ -37,5 +39,8 @@ object NoteDatabaseFactory {
     })
 
     suspend fun <T> noteQuery(block: suspend () -> T): T =
+        newSuspendedTransaction(Dispatchers.IO) { block() }
+
+    suspend fun <T> userQuery(block: suspend () -> T): T =
         newSuspendedTransaction(Dispatchers.IO) { block() }
 }
