@@ -17,7 +17,13 @@ https://github.com/DarkNDev/com.darkndev.notes-api-alt/assets/49820671/eea4aeb7-
 
 
 ### Libraries Used
-Content Negotiation, Kotlin serialization, Logging, JWT Authentication, Exposed with H2 Database, Apache commons codec and HikariCP network pooling.
+1. Content Negotiation
+2. Kotlin serialization
+3. Logging
+4. JWT Authentication
+5. Exposed with H2 Database
+6. Apache commons codec
+7. HikariCP network pooling.
 ### Links
 Authentication usage example -
 1. Server for usage [com.darkndev.ktor-auth](https://github.com/DarkNDev/com.darkndev.ktor-auth)
