@@ -24,7 +24,7 @@ fun Application.module() {
         issuer = environment.config.property("jwt.issuer").getString(),
         audience = environment.config.property("jwt.audience").getString(),
         expiresIn = Duration.ofDays(365).toMillis(),
-        secret = System.getenv("JWT_SECRET")
+        secret = environment.config.property("jwt.secret").getString()
     )
 
     val hashingService = SHA256HashingService()

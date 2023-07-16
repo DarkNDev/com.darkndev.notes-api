@@ -1,5 +1,5 @@
-# com.darkndev.notes-api-alt
-Notes Api with Authetication
+# com.darkndev.notes-api
+Notes Api with Authentication
 ### Usage
 1. Creating then signing user with password hashing and token generation -
 
