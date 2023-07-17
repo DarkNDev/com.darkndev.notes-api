@@ -21,28 +21,7 @@ class NoteDao {
         Notes.select { Notes.userId eq userId }.map(::resultRowToNote)
     }
 
-    suspend fun addNote(userId: Int, note: NoteRequest): Boolean = noteQuery {
-        val insertStatement = Notes.insert {
-            it[id] = note.id
-            it[Notes.userId] = userId
-            it[title] = note.title
-            it[content] = note.content
-        }
-        insertStatement.resultedValues?.singleOrNull()?.let(::resultRowToNote) == note
-    }
-
-    suspend fun editNote(userId: Int, note: NoteRequest): Boolean = noteQuery {
-        Notes.update({ id eq note.id and (Notes.userId eq userId) }) {
-            it[title] = note.title
-            it[content] = note.content
-        } > 0
-    }
-
-    suspend fun deleteNote(userId: Int, note: NoteRequest): Boolean = noteQuery {
-        Notes.deleteWhere { id eq note.id and (Notes.userId eq userId) } > 0
-    }
-
-    suspend fun sync(userId: Int, notes: List<NoteRequest>) = noteQuery {
+    suspend fun update(userId: Int, notes: List<NoteRequest>) = noteQuery {
         Notes.deleteWhere {
             Notes.userId eq userId
         }

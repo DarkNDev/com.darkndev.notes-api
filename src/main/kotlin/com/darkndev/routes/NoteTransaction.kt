@@ -14,62 +14,28 @@ fun Route.noteResponse(noteDao: NoteDao) {
     authenticate {
         get("/notes") {
             val principal = call.principal<JWTPrincipal>()
-            val userId = principal?.getClaim("userId", String::class)!!.toInt()
+            val userId = principal?.getClaim("userId", String::class)?.toInt()
+                ?: return@get call.respond(HttpStatusCode.Unauthorized)
             val notes = noteDao.allNotes(userId)
             call.respond(HttpStatusCode.OK, notes)
         }
 
-        post("/sync") {
+        post("/update") {
             val principal = call.principal<JWTPrincipal>()
-            val userId = principal?.getClaim("userId", String::class)!!.toInt()
+            val userId = principal?.getClaim("userId", String::class)?.toInt()
+                ?: return@post call.respond(HttpStatusCode.Unauthorized)
             val localNotesRequest = call.receive<List<NoteRequest>>()
-            val status = sync(userId, localNotesRequest, noteDao)
-            if (status.first)
-                call.respond(HttpStatusCode.OK, status.second)
-            else
-                call.respond(HttpStatusCode.NonAuthoritativeInformation, status.second)
-        }
-
-        post("/add") {
-            val principal = call.principal<JWTPrincipal>()
-            val userId = principal?.getClaim("userId", String::class)!!.toInt()
-            val addNoteRequest = call.receive<NoteRequest>()
-            val status = noteDao.addNote(userId, addNoteRequest)
-            if (status)
-                call.respond(HttpStatusCode.OK, "Note Added")
-            else
-                call.respond(HttpStatusCode.NonAuthoritativeInformation, "Failed")
-        }
-
-        post("/edit") {
-            val principal = call.principal<JWTPrincipal>()
-            val userId = principal?.getClaim("userId", String::class)!!.toInt()
-            val editNoteRequest = call.receive<NoteRequest>()
-            val status = noteDao.editNote(userId, editNoteRequest)
-            if (status)
-                call.respond(HttpStatusCode.OK, "Note Updated")
-            else
-                call.respond(HttpStatusCode.NonAuthoritativeInformation, "Failed")
-        }
-
-        post("/delete") {
-            val principal = call.principal<JWTPrincipal>()
-            val userId = principal?.getClaim("userId", String::class)!!.toInt()
-            val deleteNoteRequest = call.receive<NoteRequest>()
-            val status = noteDao.deleteNote(userId, deleteNoteRequest)
-            if (status)
-                call.respond(HttpStatusCode.OK, "Note Deleted")
-            else
-                call.respond(HttpStatusCode.NonAuthoritativeInformation, "Failed")
+            val status = updateNotes(userId, localNotesRequest, noteDao)
+            call.respond(status.first, status.second)
         }
     }
 }
 
-suspend fun sync(userId: Int, localNotes: List<NoteRequest>, noteDao: NoteDao): Pair<Boolean, String> {
+suspend fun updateNotes(userId: Int, localNotes: List<NoteRequest>, noteDao: NoteDao): Pair<HttpStatusCode, String> {
     val serverNotes = noteDao.allNotes(userId)
     if (localNotes != serverNotes) {
-        val status = noteDao.sync(userId, localNotes)
-        return if (status) true to "Sync Successful" else false to "Sync Failed"
+        val status = noteDao.update(userId, localNotes)
+        return if (status) HttpStatusCode.OK to "Notes Updated" else HttpStatusCode.Conflict to "Update Failed"
     }
-    return Pair(true, "Sync Not Needed")
+    return Pair(HttpStatusCode.OK, "Update Not Needed")
 }

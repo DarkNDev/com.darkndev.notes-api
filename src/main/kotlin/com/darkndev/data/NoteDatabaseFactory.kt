@@ -2,41 +2,33 @@ package com.darkndev.data
 
 import com.darkndev.models.Notes
 import com.darkndev.models.Users
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.config.*
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.io.File
 
 object NoteDatabaseFactory {
     fun init(config: ApplicationConfig) {
-        val driverClassName = config.property("storage.driverClassName").getString()
-        val jdbcURL =
-            config.property("storage.jdbcURL").getString() + (config.propertyOrNull("storage.dbFilePath")?.getString()
-                ?.let {
-                    File(it).canonicalFile.absolutePath
-                } ?: "")
-        val database = Database.connect(createHikariDataSource(url = jdbcURL, driver = driverClassName))
-        transaction(database) {
+        val url = config.property("postgres.url").getString()
+        val name = config.property("postgres.name").getString()
+        val port = config.property("postgres.port").getString()
+        val driver = config.property("postgres.driver").getString()
+        val username = config.property("postgres.user").getString()
+        val password = config.property("postgres.password").getString()
+        val connectionUrl = "jdbc:postgresql://$url:$port/$name"
+        Database.connect(
+            url = connectionUrl,
+            driver = driver,
+            user = username,
+            password = password
+        )
+        transaction {
             SchemaUtils.create(Notes)
             SchemaUtils.create(Users)
         }
     }
-
-    private fun createHikariDataSource(
-        url: String, driver: String
-    ) = HikariDataSource(HikariConfig().apply {
-        driverClassName = driver
-        jdbcUrl = url
-        maximumPoolSize = 5
-        isAutoCommit = false
-        transactionIsolation = "TRANSACTION_REPEATABLE_READ"
-        validate()
-    })
 
     suspend fun <T> noteQuery(block: suspend () -> T): T =
         newSuspendedTransaction(Dispatchers.IO) { block() }
