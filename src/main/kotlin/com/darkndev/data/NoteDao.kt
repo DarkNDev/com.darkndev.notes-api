@@ -1,7 +1,7 @@
 package com.darkndev.data
 
 import com.darkndev.data.NoteDatabaseFactory.noteQuery
-import com.darkndev.models.NoteRequest
+import com.darkndev.models.Note
 import com.darkndev.models.Notes
 import com.darkndev.models.Notes.content
 import com.darkndev.models.Notes.id
@@ -11,17 +11,17 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 class NoteDao {
 
-    private fun resultRowToNote(row: ResultRow) = NoteRequest(
+    private fun resultRowToNote(row: ResultRow) = Note(
         id = row[id],
         title = row[title],
         content = row[content]
     )
 
-    suspend fun allNotes(userId: Int): List<NoteRequest> = noteQuery {
+    suspend fun allNotes(userId: Int): List<Note> = noteQuery {
         Notes.select { Notes.userId eq userId }.map(::resultRowToNote)
     }
 
-    suspend fun update(userId: Int, notes: List<NoteRequest>) = noteQuery {
+    suspend fun update(userId: Int, notes: List<Note>) = noteQuery {
         Notes.deleteWhere {
             Notes.userId eq userId
         }

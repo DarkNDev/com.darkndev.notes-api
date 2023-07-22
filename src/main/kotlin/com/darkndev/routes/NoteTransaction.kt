@@ -1,7 +1,7 @@
 package com.darkndev.routes
 
 import com.darkndev.data.NoteDao
-import com.darkndev.models.NoteRequest
+import com.darkndev.models.Note
 import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.application.*
@@ -24,14 +24,14 @@ fun Route.noteResponse(noteDao: NoteDao) {
             val principal = call.principal<JWTPrincipal>()
             val userId = principal?.getClaim("userId", String::class)?.toInt()
                 ?: return@post call.respond(HttpStatusCode.Unauthorized)
-            val localNotesRequest = call.receive<List<NoteRequest>>()
+            val localNotesRequest = call.receive<List<Note>>()
             val status = updateNotes(userId, localNotesRequest, noteDao)
             call.respond(status.first, status.second)
         }
     }
 }
 
-suspend fun updateNotes(userId: Int, localNotes: List<NoteRequest>, noteDao: NoteDao): Pair<HttpStatusCode, String> {
+suspend fun updateNotes(userId: Int, localNotes: List<Note>, noteDao: NoteDao): Pair<HttpStatusCode, String> {
     val serverNotes = noteDao.allNotes(userId)
     if (localNotes != serverNotes) {
         val status = noteDao.update(userId, localNotes)
