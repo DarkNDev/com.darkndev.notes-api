@@ -18,14 +18,16 @@ fun Route.signIn(
     hashingService: SHA256HashingService,
     tokenService: JwtTokenService,
     tokenConfig: TokenConfig,
-    userDao:UserDao
+    userDao: UserDao
 ) {
     post("/signin") {
         val request = call.receive<AuthRequest>()
 
-        val user = userDao.getUserByUsername(request.username)
-        if (user == null) {
-            call.respond(HttpStatusCode.Conflict, "Incorrect username or password")
+        val user = userDao.getUserByUsername(request.emailId)
+            ?: return@post call.respond(HttpStatusCode.Conflict, "Incorrect email or password")
+
+        if (!user.verified) {
+            call.respond(HttpStatusCode.Conflict, "Verify user")
             return@post
         }
 
@@ -38,7 +40,7 @@ fun Route.signIn(
         )
 
         if (!isValidPassword) {
-            call.respond(HttpStatusCode.Conflict, "Incorrect username or password")
+            call.respond(HttpStatusCode.Conflict, "Incorrect email or password")
             return@post
         }
 

@@ -32,5 +32,5 @@ fun Application.module() {
     val userDao = UserDao()
 
     configureSecurity(tokenConfig)
-    configureRouting(hashingService, tokenService, tokenConfig, noteDao, userDao)
+    configureRouting(hashingService, tokenService, tokenConfig, noteDao, userDao, environment.config)
 }

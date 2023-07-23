@@ -17,7 +17,7 @@ object NoteDatabaseFactory {
         val driver = config.property("postgres.driver").getString()
         val username = config.property("postgres.user").getString()
         val password = config.property("postgres.password").getString()
-        val connectionUrl = "jdbc:postgresql://$url:$port/$name?ssl=true"
+        val connectionUrl = "jdbc:postgresql://$url:$port/$name"
         Database.connect(
             url = connectionUrl,
             driver = driver,
